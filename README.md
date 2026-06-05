@@ -19,6 +19,28 @@ Taurus is designed around:
 - reconciliation before trust,
 - compliance-aware product scope before commercial launch.
 
+## Public Repository Metadata
+
+Recommended GitHub repository name:
+
+- `risk-first-ai-trading-agent`
+
+Recommended description:
+
+> Taurus: risk-first autonomous trading platform with auditable decisions, broker reconciliation, model governance, and demo/live readiness controls.
+
+Recommended topics:
+
+- `fintech`
+- `algorithmic-trading`
+- `risk-management`
+- `ai-agents`
+- `model-governance`
+- `python`
+- `trading-systems`
+
+This repository is intended to be externally verifiable engineering evidence for a research/demo governance platform. Public materials should describe Taurus as educational, paper/demo trading, model-risk, auditability, and developer infrastructure. They should not claim investment performance or imply that users should buy or sell any asset.
+
 ## Current Status
 
 This repo is currently the local agent and governance engine. It is not yet the hosted SaaS app described in the roadmap documents.
@@ -69,6 +91,12 @@ Trading modes:
 The agent also refuses live trading when the kill switch exists.
 
 Public beta and hosted product plans are paper/research/governance-first. Live execution for users, broker credential storage, personalised investment recommendations, copy trading, managed accounts, paid trading signals, crypto promotion, and return claims require legal review and are out of scope for the beta plan.
+
+## Regulatory And Educational Caution
+
+Taurus is published for technical research, educational development, paper/demo trading workflows, and risk-governance exploration. It is not regulated investment advice, a financial promotion, a trading signal service, copy trading, a managed account, or an offer to manage money.
+
+Historical, simulated, backtested, demo, or paper-trading results do not predict future results. Any live use is experimental capital at risk and requires independent legal, regulatory, operational, and security review.
 
 ## Quick Start
 
@@ -212,6 +240,9 @@ The Taurus production plan is captured in these documents:
 - [DESIGN_UI_UX_BRIEF.md](DESIGN_UI_UX_BRIEF.md): premium fintech UI/UX direction, information architecture, key screens, accessibility, and design system.
 - [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md): production backend schema, migration strategy, indexes, retention, billing, incidents, analytics, GDPR/CCPA, and scalability requirements.
 - [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md): phased build plan, dependencies, production controls, launch gates, and immediate engineering sequence.
+- [SECURITY.md](SECURITY.md): vulnerability reporting, sensitive-data handling, supported scope, and safety boundaries.
+- [CONTRIBUTING.md](CONTRIBUTING.md): contribution setup, testing, safety scope, and public-language guidance.
+- [CHANGELOG.md](CHANGELOG.md): dated project changes and release notes.
 
 ## Roadmap Summary
 
