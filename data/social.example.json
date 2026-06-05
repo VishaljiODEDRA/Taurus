@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "title": "$NVDA data-center demand chatter is accelerating after supplier comments",
+      "summary": "Example social/tweet-style catalyst item. Replace with posts exported from X, StockTwits, Reddit, or another collector.",
+      "url": "https://example.com/social/nvda-demand",
+      "published_at": "2026-05-15T08:00:00Z",
+      "source": "social",
+      "symbols": ["NVDA"]
+    }
+  ]
+}

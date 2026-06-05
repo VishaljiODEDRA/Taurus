@@ -1,0 +1,27 @@
+{
+  "entities": {
+    "AAPL": {
+      "company_names": ["Apple", "Apple Inc"],
+      "aliases": ["Cupertino tech giant"],
+      "products": ["iPhone", "iPad", "Mac", "MacBook", "Apple Watch", "App Store", "Vision Pro", "AirPods"],
+      "subsidiaries": ["Beats", "Shazam"],
+      "suppliers": ["TSMC", "Taiwan Semiconductor", "Foxconn", "Hon Hai", "Pegatron", "Luxshare"],
+      "competitors": ["Samsung", "Google Pixel", "Android"],
+      "executives": ["Tim Cook", "Luca Maestri"]
+    },
+    "NVDA": {
+      "company_names": ["Nvidia", "NVIDIA"],
+      "products": ["Blackwell", "H100", "H200", "GB200", "CUDA", "GeForce"],
+      "suppliers": ["TSMC", "Taiwan Semiconductor", "SK Hynix", "Micron"],
+      "competitors": ["AMD", "Intel"],
+      "executives": ["Jensen Huang"]
+    },
+    "TSM": {
+      "company_names": ["TSMC", "Taiwan Semiconductor"],
+      "products": ["CoWoS", "3nm", "2nm", "advanced packaging"],
+      "customers": ["Apple", "Nvidia", "AMD", "Qualcomm"],
+      "competitors": ["Samsung Foundry", "Intel Foundry"],
+      "executives": ["C.C. Wei", "Mark Liu"]
+    }
+  }
+}

@@ -1,0 +1,235 @@
+[agent]
+name = "etoro-agent-portfolio-alpha"
+timezone = "Europe/London"
+loop_interval_seconds = 300
+max_candidates_per_cycle = 20
+
+[execution]
+# shadow = journal suggested trades only
+# demo = submit to eToro demo endpoints
+# live = submit to eToro real endpoints, requires AUTOTRADER_ALLOW_LIVE=true and --allow-live
+mode = "demo"
+environment = "demo"
+base_currency = "USD"
+
+[universe]
+symbols = ["AAPL", "MSFT", "NVDA", "AMD", "GOOGL", "META", "AMZN", "TSLA", "SPY", "QQQ"]
+benchmark_symbol = "SPY"
+allowed_asset_types = ["Stock", "ETF"]
+long_only = true
+max_symbols_per_cycle = 10
+cursor_path = "state/universe_cursor.txt"
+market_cache_path = "state/market_cache.json"
+instrument_cache_ttl_days = 14
+candle_cache_ttl_minutes = 360
+chart_data_source = "tradingview"
+chart_data_fallback_source = "yahoo"
+tradingview_timeout_seconds = 8
+
+# Optional fallback if eToro's search endpoint is unavailable for your account/session.
+# Fill with IDs returned by eToro search or the developer portal "Try it" tool.
+[universe.instrument_ids]
+# SPY = 123
+# AAPL = 456
+
+[universe.sector_map]
+# AAPL = "technology"
+# MSFT = "technology"
+
+[risk]
+min_order_usd = 25
+max_positions = 2
+max_position_pct_nav = 0.05
+max_gross_exposure_pct = 1.0
+max_daily_loss_pct = 0.02
+max_rolling_drawdown_pct = 0.08
+max_spread_bps = 30
+max_data_staleness_seconds = 60
+cooldown_after_loss_minutes = 120
+one_order_per_symbol_per_cycle = true
+allow_averaging_down = false
+max_leverage = 1
+kill_switch_path = "state/KILL_SWITCH"
+adaptive_protection_enabled = true
+min_stop_loss_pct = 0.008
+max_stop_loss_pct = 0.03
+min_take_profit_pct = 0.012
+max_take_profit_pct = 0.09
+min_reward_to_risk = 1.2
+max_reward_to_risk = 3.2
+max_sector_exposure_pct = 0.25
+max_sector_positions = 3
+max_peer_group_positions = 2
+max_symbol_correlation = 0.88
+max_average_correlation = 0.72
+regime_risk_off_buy_block = true
+regime_event_driven_buy_block = true
+regime_volatile_size_multiplier = 0.6
+regime_weak_size_multiplier = 0.75
+regime_bullish_size_multiplier = 1.05
+min_avg_daily_dollar_volume = 50000000
+max_expected_slippage_bps = 25
+min_execution_quality_score = 0.42
+unstable_gap_threshold_pct = 0.025
+minimum_close_location_for_entry = 0.35
+execution_retry_attempts = 2
+portfolio_optimization_enabled = true
+max_portfolio_hhi = 0.16
+max_projected_stress_loss_pct = 0.05
+
+[exits]
+enabled = true
+max_holding_days = 10
+hard_stop_loss_pct = 0.025
+take_profit_pct = 0.06
+momentum_take_profit_min_pct = 0.01
+momentum_take_profit_max_pct = 0.015
+trailing_stop_pct = 0.035
+min_exit_score = 0.38
+exit_on_ma_break = true
+exit_on_negative_news = true
+hold_on_positive_momentum = true
+require_market_confirmation_for_take_profit = true
+require_news_confirmation_for_take_profit = true
+momentum_hold_threshold = 0.58
+market_hold_threshold = 0.55
+news_hold_sentiment_floor = 0.05
+min_dynamic_stop_loss_pct = 0.008
+max_dynamic_stop_loss_pct = 0.03
+min_dynamic_take_profit_pct = 0.012
+max_dynamic_take_profit_pct = 0.09
+exit_pressure_threshold = 0.58
+loss_pressure_threshold = 0.45
+
+[monitoring]
+enabled = true
+max_order_reject_rate = 0.25
+max_consecutive_rejects = 3
+max_halted_cycles = 3
+auto_kill_switch_on_breach = true
+alert_log_path = "logs/alerts.jsonl"
+
+[validation]
+backtest_initial_cash_usd = 10000
+backtest_position_pct_nav = 0.05
+backtest_fee_bps = 2
+backtest_slippage_bps = 5
+backtest_max_holding_days = 10
+walk_forward_train_days = 60
+walk_forward_test_days = 20
+walk_forward_step_days = 20
+min_backtest_trades = 10
+min_walk_forward_trades = 5
+min_profit_factor = 1.15
+min_sharpe = 0.25
+max_backtest_drawdown_pct = 0.12
+calibration_min_samples = 20
+multiple_testing_penalty_trials = 25
+min_deflated_sharpe_proxy = 0.05
+
+[strategy]
+buy_threshold = 0.72
+sell_threshold = 0.30
+news_weight = 0.18
+momentum_weight = 0.32
+relative_strength_weight = 0.20
+volume_weight = 0.12
+catalyst_weight = 0.10
+chart_weight = 0.26
+ml_weight = 0.22
+risk_penalty_weight = 0.08
+previous_day_window = 1
+previous_week_window = 5
+previous_month_window = 21
+rsi_period = 14
+fast_ma_period = 10
+slow_ma_period = 30
+volatility_window = 20
+take_profit_pct = 0.06
+stop_loss_pct = 0.025
+trailing_stop = false
+meta_labeling_enabled = true
+meta_label_min_samples = 12
+meta_label_take_threshold = 0.57
+meta_label_block_threshold = 0.46
+edge_sizing_enabled = true
+min_edge_size_multiplier = 0.55
+max_edge_size_multiplier = 1.15
+
+[strategy.peer_groups.semiconductors]
+symbols = ["NVDA", "AMD", "AVGO", "MU", "TSM", "ASML"]
+leader_move_threshold_pct = 0.035
+laggard_max_move_pct = 0.012
+
+[strategy.peer_groups.megacap_tech]
+symbols = ["AAPL", "MSFT", "GOOGL", "META", "AMZN"]
+leader_move_threshold_pct = 0.025
+laggard_max_move_pct = 0.010
+
+[news]
+enabled = true
+lookback_hours = 720
+local_news_path = "data/news.json"
+local_social_path = "data/social.json"
+entity_map_path = "data/news_entities.json"
+rss_urls = [
+  "https://finance.yahoo.com/rss/topstories",
+  "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+  "https://feeds.bloomberg.com/markets/news.rss",
+  "https://feeds.bloomberg.com/economics/news.rss",
+  "https://feeds.bloomberg.com/technology/news.rss",
+  "https://www.ft.com/?format=rss",
+  "https://www.barrons.com/xml/rss/3_7031.xml",
+  "https://www.investors.com/feed/",
+  "https://www.morningstar.com/rss",
+  "https://www.kiplinger.com/feed",
+  "https://www.etftrends.com/feed/",
+  "https://www.etf.com/rss.xml",
+  "https://ritholtz.com/feed/",
+  "https://wolfstreet.com/feed/",
+  "https://feeds.feedburner.com/CalculatedRisk",
+  "https://feeds.feedburner.com/zerohedge/feed",
+  "https://oilprice.com/rss/main",
+  "https://www.coindesk.com/arc/outboundfeeds/rss/",
+  "https://cointelegraph.com/rss",
+  "https://decrypt.co/feed",
+  "https://www.theblock.co/rss.xml",
+  "https://cryptoslate.com/feed/",
+  "https://qz.com/rss",
+  "https://www.vox.com/rss/recode/index.xml",
+  "https://www.engadget.com/rss.xml",
+  "https://www.wired.com/feed/category/business/latest/rss",
+  "https://feeds.arstechnica.com/arstechnica/index",
+  "https://www.technologyreview.com/feed/",
+  "https://venturebeat.com/feed/",
+  "https://siliconangle.com/feed/",
+  "https://www.pymnts.com/feed/",
+  "https://www.paymentsdive.com/feeds/news/",
+  "https://www.bankingdive.com/feeds/news/",
+  "https://www.cfodive.com/feeds/news/",
+  "https://www.ciodive.com/feeds/news/",
+  "https://www.cybersecuritydive.com/feeds/news/",
+  "https://www.supplychaindive.com/feeds/news/",
+  "https://www.retaildive.com/feeds/news/",
+  "https://www.manufacturingdive.com/feeds/news/",
+  "https://www.utilitydive.com/feeds/news/",
+  "https://www.biopharmadive.com/feeds/news/",
+  "https://www.healthcaredive.com/feeds/news/",
+  "https://www.theguardian.com/business/rss",
+  "https://feeds.bbci.co.uk/news/business/rss.xml",
+  "https://rss.cnn.com/rss/money_latest.rss",
+  "https://feeds.nbcnews.com/nbcnews/public/business",
+  "https://www.spglobal.com/marketintelligence/en/news-insights/rss",
+  "https://www.fitchratings.com/site/rss",
+  "https://www.moodys.com/rss",
+  "https://www.ecb.europa.eu/rss/press.html",
+  "https://www.bankofengland.co.uk/rss/news",
+  "https://www.ftc.gov/feeds/press-releases.xml"
+]
+rss_timeout_seconds = 4
+rss_max_workers = 12
+use_openai_context = false
+
+[storage]
+sqlite_path = "state/agent_ledger.sqlite3"
+audit_log_path = "logs/audit.jsonl"

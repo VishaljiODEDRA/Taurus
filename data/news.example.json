@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "title": "NVDA raises guidance after strong data-center demand",
+      "summary": "Example local catalyst item for offline testing.",
+      "url": "https://example.com/nvda-guidance",
+      "published_at": "2026-04-27T08:00:00Z",
+      "source": "example",
+      "symbols": ["NVDA", "AMD"]
+    }
+  ]
+}
+
