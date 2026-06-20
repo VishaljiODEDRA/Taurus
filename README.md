@@ -92,6 +92,8 @@ The agent also refuses live trading when the kill switch exists.
 
 Public beta and hosted product plans are paper/research/governance-first. Live execution for users, broker credential storage, personalised investment recommendations, copy trading, managed accounts, paid trading signals, crypto promotion, and return claims require legal review and are out of scope for the beta plan.
 
+For the June 2026 operating workflow, see [docs/DEMO_TRADING_PROTOCOL.md](docs/DEMO_TRADING_PROTOCOL.md). It defines the shadow/demo-only process, live-trading blocks, kill-switch checks, safe validation commands, and redacted weekly evidence summaries.
+
 ## Regulatory And Educational Caution
 
 Taurus is published for technical research, educational development, paper/demo trading workflows, and risk-governance exploration. It is not regulated investment advice, a financial promotion, a trading signal service, copy trading, a managed account, or an offer to manage money.
@@ -243,6 +245,12 @@ The Taurus production plan is captured in these documents:
 - [SECURITY.md](SECURITY.md): vulnerability reporting, sensitive-data handling, supported scope, and safety boundaries.
 - [CONTRIBUTING.md](CONTRIBUTING.md): contribution setup, testing, safety scope, and public-language guidance.
 - [CHANGELOG.md](CHANGELOG.md): dated project changes and release notes.
+- [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md): founder/product vision, mission, safety principles, roadmap, and innovation thesis.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): current architecture, decision cycle, data flow, ledger/audit trail, and built-now versus planned-next boundaries.
+- [docs/RISK_GOVERNANCE.md](docs/RISK_GOVERNANCE.md): deterministic risk gates, kill switch, pre-trade policy, portfolio risk, and compliance boundaries.
+- [docs/MODEL_GOVERNANCE.md](docs/MODEL_GOVERNANCE.md): feature evidence, training lifecycle, promotion gates, reliability reports, drift, and replay.
+- [docs/BROKER_AND_EXECUTION.md](docs/BROKER_AND_EXECUTION.md): shadow/demo/live modes, broker selection, eToro execution flow, demo/live safety gates, and reconciliation.
+- [docs/DEMO_TRADING_PROTOCOL.md](docs/DEMO_TRADING_PROTOCOL.md): demo-only operating workflow, validation commands, live-block checks, and weekly redacted summaries.
 
 ## Roadmap Summary
 

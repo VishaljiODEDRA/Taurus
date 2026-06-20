@@ -4,6 +4,14 @@ All notable changes to Taurus will be documented in this file.
 
 The format follows a simple date-based project log while the project is pre-1.0.
 
+## [Unreleased]
+
+### Added
+
+- Demo-only trading protocol documenting shadow/demo operation, live-trading blocks, kill-switch usage, safe validation commands, reconciliation/report workflow, and weekly redacted evidence summaries.
+- Architecture pack with system architecture, risk governance, model governance, and broker/execution documentation, including Mermaid diagrams for decision flow, data flow, ledger/audit trail, risk gates, model lifecycle, and demo/live safety gates.
+- Product vision document positioning Taurus as a global fintech AI trading governance platform with mission, target users, safety principles, compliance boundaries, roadmap, and innovation thesis.
+
 ## [0.1.0] - 2026-06-05
 
 ### Added
