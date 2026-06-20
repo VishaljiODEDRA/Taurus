@@ -90,15 +90,15 @@ flowchart TD
     VetoMemory --> Committee[Committee approval features]
     Committee --> Loop[For each trade decision]
     Loop --> RecordDecision[Record decision]
-    RecordDecision --> RiskGate[RiskEngine.evaluate()]
+    RecordDecision --> RiskGate["RiskEngine.evaluate()"]
     RiskGate --> RecordRisk[Record risk check]
     RecordRisk --> Approved{Risk approved?}
     Approved -- no --> Next[Next decision]
     Approved -- yes --> Order[Create OrderRequest]
-    Order --> Policy[ImmutablePreTradePolicy.evaluate()]
+    Order --> Policy["ImmutablePreTradePolicy.evaluate()"]
     Policy --> PolicyOK{Policy approved?}
     PolicyOK -- no --> RecordRejected[Record rejected order]
-    PolicyOK -- yes --> Execute[Broker.execute()]
+    PolicyOK -- yes --> Execute["Broker.execute()"]
     Execute --> RecordOrder[Record order result]
     RecordOrder --> Actuals[Record execution actuals]
     Actuals --> TradeContext[Record open/closed trade context]
