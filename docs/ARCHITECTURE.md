@@ -73,7 +73,7 @@ flowchart LR
 flowchart TD
     Start[Start cycle] --> Kill{Kill switch active?}
     Kill -- yes --> Halt[Record halted cycle<br/>halt_reason=kill_switch_active]
-    Kill -- no --> BuildBroker[build_broker()]
+    Kill -- no --> BuildBroker["build_broker()"]
     BuildBroker --> BrokerOK{Broker allowed?}
     BrokerOK -- no --> HaltBroker[Record halted cycle<br/>permission/config error]
     BrokerOK -- yes --> Snapshots[Load market snapshots]
