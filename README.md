@@ -251,6 +251,7 @@ The Taurus production plan is captured in these documents:
 - [docs/MODEL_GOVERNANCE.md](docs/MODEL_GOVERNANCE.md): feature evidence, training lifecycle, promotion gates, reliability reports, drift, and replay.
 - [docs/BROKER_AND_EXECUTION.md](docs/BROKER_AND_EXECUTION.md): shadow/demo/live modes, broker selection, eToro execution flow, demo/live safety gates, and reconciliation.
 - [docs/DEMO_TRADING_PROTOCOL.md](docs/DEMO_TRADING_PROTOCOL.md): demo-only operating workflow, validation commands, live-block checks, and weekly redacted summaries.
+- [docs/build-logs/README.md](docs/build-logs/README.md): public build-log system, publishing rules, weekly template, and index.
 
 ## Roadmap Summary
 
