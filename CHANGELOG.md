@@ -8,6 +8,7 @@ The format follows a simple date-based project log while the project is pre-1.0.
 
 ### Added
 
+- Feedback-first outreach pack with public target research, founder/AI/risk message drafts, demo outline, funding-aware notes, and private CRM template.
 - Public build-log system under `docs/build-logs/` with publishing rules, weekly template, index, and first founder-engineer build log.
 - Demo-only trading protocol documenting shadow/demo operation, live-trading blocks, kill-switch usage, safe validation commands, reconciliation/report workflow, and weekly redacted evidence summaries.
 - Architecture pack with system architecture, risk governance, model governance, and broker/execution documentation, including Mermaid diagrams for decision flow, data flow, ledger/audit trail, risk gates, model lifecycle, and demo/live safety gates.

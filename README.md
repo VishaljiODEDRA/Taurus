@@ -252,6 +252,7 @@ The Taurus production plan is captured in these documents:
 - [docs/BROKER_AND_EXECUTION.md](docs/BROKER_AND_EXECUTION.md): shadow/demo/live modes, broker selection, eToro execution flow, demo/live safety gates, and reconciliation.
 - [docs/DEMO_TRADING_PROTOCOL.md](docs/DEMO_TRADING_PROTOCOL.md): demo-only operating workflow, validation commands, live-block checks, and weekly redacted summaries.
 - [docs/build-logs/README.md](docs/build-logs/README.md): public build-log system, publishing rules, weekly template, and index.
+- [docs/OUTREACH.md](docs/OUTREACH.md): feedback-first outreach pack, demo outline, public target research, message drafts, and private CRM template.
 
 ## Roadmap Summary
 
@@ -262,6 +263,7 @@ June 2026:
 - architecture and governance docs,
 - demo-only operating protocol,
 - weekly build logs.
+- feedback-first outreach pack.
 
 July 2026:
 
