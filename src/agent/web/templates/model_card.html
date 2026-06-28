@@ -29,6 +29,19 @@
     </article>
   </section>
   <section class="panel">
+    <div class="panel-heading"><h2>Training Evidence</h2><span>{{ training_evidence_status }}</span></div>
+    {% if training %}
+      <dl class="kv-grid">
+        <div><dt>Sample count</dt><dd>{{ training.sample_count }}</dd></div>
+        <div><dt>Train window</dt><dd>{{ training.train_window }}</dd></div>
+        <div><dt>Test window</dt><dd>{{ training.test_window }}</dd></div>
+        <div><dt>Artifact</dt><dd>{{ training.parameters_json.artifact_path|default("n/a") }}</dd></div>
+      </dl>
+    {% else %}
+      <p class="empty">No matching training run found for this model version.</p>
+    {% endif %}
+  </section>
+  <section class="panel">
     <div class="panel-heading"><h2>Known Limitations</h2></div>
     <ul class="plain-list">{% for item in known_limitations %}<li>{{ item }}</li>{% endfor %}</ul>
   </section>
@@ -42,4 +55,3 @@
   </section>
 {% endif %}
 {% endblock %}
-

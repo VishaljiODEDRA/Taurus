@@ -44,3 +44,4 @@ src/*.egg-info/
 # Generated analysis/cache output
 graphify-out/
 private/
+exports/

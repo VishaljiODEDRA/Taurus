@@ -15,6 +15,8 @@ PRIVATE_KEY_MARKERS = (
     "user_key",
     "api_key",
     "raw_json",
+    "raw_features",
+    "features_json",
 )
 
 
@@ -60,4 +62,3 @@ def basename_only(value: Any) -> str:
     if not value:
         return ""
     return Path(str(value)).name
-

@@ -42,7 +42,7 @@
             <div><span>Environment</span><strong>{{ runtime.environment }}</strong></div>
             <div>
               <span>Kill switch</span>
-              <strong class="status {{ runtime.kill_switch_active|status_class }}">
+              <strong class="status {{ runtime.kill_switch_status_class }}">
                 {% if runtime.kill_switch_active %}active{% else %}inactive{% endif %}
               </strong>
             </div>

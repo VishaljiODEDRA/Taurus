@@ -19,6 +19,12 @@ The format follows a simple date-based project log while the project is pre-1.0.
 - Architecture pack with system architecture, risk governance, model governance, and broker/execution documentation, including Mermaid diagrams for decision flow, data flow, ledger/audit trail, risk gates, model lifecycle, and demo/live safety gates.
 - Product vision document positioning Taurus as a global fintech AI trading governance platform with mission, target users, safety principles, compliance boundaries, roadmap, and innovation thesis.
 
+### Fixed
+
+- Corrected active kill-switch dashboard styling so halted runtime state appears as a critical safety condition, not a healthy status.
+- Made audit export manifests account for every ZIP member and document the checksum integrity model.
+- Ignored generated `exports/` packs by default and tightened replay/model evidence rendering to avoid raw payload-style dashboard output.
+
 ## [0.1.0] - 2026-06-05
 
 ### Added

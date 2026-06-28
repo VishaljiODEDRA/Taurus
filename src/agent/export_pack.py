@@ -19,10 +19,14 @@ EXPORT_REDACTION_POLICY_VERSION = "taurus-redaction-v1"
 def build_audit_export_pack(config: AppConfig, ledger: Ledger, output_path: str | Path) -> Path:
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
-    files = _export_files(config, ledger)
-    manifest = _manifest_for(files)
-    files["manifest.json"] = json.dumps(manifest, indent=2, sort_keys=True)
-    files["checksums.sha256"] = _checksums_text(files)
+    payload_files = _export_files(config, ledger)
+    checksums = _checksums_text(payload_files)
+    manifest = _manifest_for(payload_files, checksums)
+    files = {
+        **payload_files,
+        "manifest.json": json.dumps(manifest, indent=2, sort_keys=True),
+        "checksums.sha256": checksums,
+    }
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name, content in files.items():
             archive.writestr(name, content)
@@ -107,17 +111,36 @@ def _report_html(summary: dict[str, Any]) -> str:
     )
 
 
-def _manifest_for(files: dict[str, str]) -> dict[str, Any]:
+def _manifest_for(payload_files: dict[str, str], checksums_text: str) -> dict[str, Any]:
+    checksum_bytes = checksums_text.encode("utf-8")
     return {
         "generated_at": datetime.now(tz=UTC).isoformat(),
         "redaction_policy": EXPORT_REDACTION_POLICY_VERSION,
+        "integrity_model": (
+            "checksums.sha256 contains payload file hashes. manifest.json and checksums.sha256 "
+            "are listed as integrity metadata to avoid self-referential checksum ambiguity."
+        ),
         "files": [
             {
                 "name": name,
                 "bytes": len(content.encode("utf-8")),
                 "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                "role": "payload",
             }
-            for name, content in sorted(files.items())
+            for name, content in sorted(payload_files.items())
+        ] + [
+            {
+                "name": "manifest.json",
+                "bytes": None,
+                "sha256": None,
+                "role": "integrity_metadata",
+            },
+            {
+                "name": "checksums.sha256",
+                "bytes": len(checksum_bytes),
+                "sha256": hashlib.sha256(checksum_bytes).hexdigest(),
+                "role": "integrity_metadata",
+            },
         ],
     }
 
@@ -138,4 +161,3 @@ def _cycle_status(row: dict[str, Any]) -> str:
     if not row:
         return "not_recorded"
     return "halted" if row.get("halted") else "operational"
-

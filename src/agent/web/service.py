@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -34,6 +34,7 @@ class DashboardService:
     def base_context(self, *, active: str) -> dict[str, Any]:
         mode = self.config.execution.normalized_mode()
         environment = self.config.execution.normalized_environment()
+        kill_switch_active = is_kill_switch_active(self.config.risk.kill_switch_path)
         return {
             "active": active,
             "safety_notice": SAFETY_NOTICE,
@@ -53,7 +54,8 @@ class DashboardService:
             "runtime": {
                 "mode": mode,
                 "environment": environment,
-                "kill_switch_active": is_kill_switch_active(self.config.risk.kill_switch_path),
+                "kill_switch_active": kill_switch_active,
+                "kill_switch_status_class": "bad" if kill_switch_active else "good",
                 "ledger_name": Path(self.config.storage.sqlite_path).name,
                 "audit_log_name": Path(self.config.storage.audit_log_path).name,
                 "dangerous_runtime": mode == "live" or environment == "real",
@@ -334,7 +336,15 @@ class DashboardService:
             reason = str(row.get("reason") or "approved")
             latest_by_reason.setdefault(reason, row)
         controls = [
-            _control("Kill switch", True, self.config.risk.kill_switch_path, "active" if is_kill_switch_active(self.config.risk.kill_switch_path) else "inactive", "", "", "risk.py"),
+            _control(
+                "Kill switch",
+                True,
+                self.config.risk.kill_switch_path,
+                "halted" if is_kill_switch_active(self.config.risk.kill_switch_path) else "inactive",
+                "Kill switch file is present." if is_kill_switch_active(self.config.risk.kill_switch_path) else "No active halt file.",
+                "",
+                "risk.py",
+            ),
             _control("Max positions", True, self.config.risk.max_positions, *_breach("max_positions_reached", latest_by_reason), "risk.py"),
             _control("Max position pct NAV", True, format_percent(self.config.risk.max_position_pct_nav), *_breach("position_cap", latest_by_reason), "risk.py"),
             _control("Max gross exposure", True, format_percent(self.config.risk.max_gross_exposure_pct), *_breach("gross_exposure_limit", latest_by_reason), "portfolio.py"),
@@ -384,6 +394,7 @@ class DashboardService:
         return {
             "model": public_model,
             "training": training_runs[0] if training_runs else {},
+            "training_evidence_status": "matched" if training_runs else "not_found",
             "promotion_events": events,
             "reliability_context": reliability,
             "known_limitations": limitations,
@@ -433,10 +444,7 @@ class DashboardService:
         missing: list[str] = []
         try:
             replay = PointInTimeReplayer(self.ledger).replay(as_of, symbol=symbol, limit=20)
-            context = {
-                "cycle_features": replay.cycle_features,
-                "trade_outcomes": replay.trade_outcomes,
-            }
+            context = _replay_context_summary(replay)
         except Exception as exc:  # defensive: replay must never break the UI
             context = {"error": str(exc)}
             missing.append("point-in-time replay")
@@ -573,7 +581,51 @@ def compact_items(value: Any, *, limit: int = 8) -> list[tuple[str, Any]]:
     public = as_public_value(value)
     if not isinstance(public, dict):
         return []
-    return [(str(key), val) for key, val in list(public.items())[:limit]]
+    return [(str(key), _display_value(val)) for key, val in list(public.items())[:limit]]
+
+
+def _display_value(value: Any) -> Any:
+    if isinstance(value, dict):
+        return f"{len(value)} fields summarized"
+    if isinstance(value, list):
+        return f"{len(value)} records summarized"
+    if isinstance(value, tuple):
+        return f"{len(value)} records summarized"
+    return value
+
+
+def _replay_context_summary(replay: Any) -> dict[str, Any]:
+    cycle_features = list(getattr(replay, "cycle_features", ()))
+    decisions = list(getattr(replay, "decisions", ()))
+    risk_checks = list(getattr(replay, "risk_checks", ()))
+    orders = list(getattr(replay, "orders", ()))
+    news_source_stats = list(getattr(replay, "news_source_stats", ()))
+    portfolio_risk_reports = list(getattr(replay, "portfolio_risk_reports", ()))
+    symbols = sorted(
+        {
+            str(row.get("symbol"))
+            for row in cycle_features
+            if row.get("symbol") not in ("", None)
+        }
+    )
+    approved = sum(1 for row in cycle_features if _boolish(row.get("risk_approved")) is True)
+    blocked = sum(1 for row in cycle_features if _boolish(row.get("risk_approved")) is False)
+    latest_cycle = next((row.get("cycle_id") for row in cycle_features if row.get("cycle_id")), "")
+    latest_order = orders[0] if orders else {}
+    return {
+        "cycle_feature_rows": len(cycle_features),
+        "decision_rows": len(decisions),
+        "risk_check_rows": len(risk_checks),
+        "order_rows": len(orders),
+        "news_source_rows": len(news_source_stats),
+        "portfolio_risk_rows": len(portfolio_risk_reports),
+        "symbols_seen": ", ".join(symbols[:8]) if symbols else "n/a",
+        "risk_approved_rows": approved,
+        "risk_blocked_rows": blocked,
+        "latest_cycle_id": latest_cycle or "n/a",
+        "latest_order_symbol": latest_order.get("symbol", "n/a"),
+        "latest_order_status": "accepted" if latest_order.get("accepted") else "rejected" if latest_order else "n/a",
+    }
 
 
 def _alerts_from_reconciliation(row: dict[str, Any]) -> list[dict[str, Any]]:

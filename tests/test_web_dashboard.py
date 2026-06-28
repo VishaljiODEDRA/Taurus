@@ -1,12 +1,27 @@
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import unittest
+import warnings
 import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+warnings.filterwarnings(
+    "ignore",
+    message="Using httpx with starlette.testclient is deprecated.*",
+)
+
+from starlette.exceptions import StarletteDeprecationWarning
+
+warnings.filterwarnings(
+    "ignore",
+    message="Using `httpx` with `starlette.testclient` is deprecated.*",
+    category=StarletteDeprecationWarning,
+)
 
 from fastapi.testclient import TestClient
 
@@ -133,6 +148,41 @@ class WebDashboardTest(unittest.TestCase):
             self.assertIn("Governed Agent Roles", client.get("/governance/roles").text)
             self.assertIn("Replay This Decision", client.get(f"/replay/decision/{feature_id}").text)
 
+    def test_active_kill_switch_renders_as_bad_halted_control(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config, ledger = _config_and_ledger(tmpdir)
+            Path(config.risk.kill_switch_path).write_text("halt\n", encoding="utf-8")
+            client = TestClient(create_app_from_config(config, ledger))
+
+            risk_controls = client.get("/risk/controls").text
+            overview = client.get("/").text
+
+            self.assertIn("Kill switch", risk_controls)
+            self.assertIn('class="status bad">halted</span>', risk_controls)
+            self.assertIn('class="status bad">\n                active', overview)
+
+    def test_replay_context_is_summarized_not_raw_payload_repr(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config, ledger = create_demo_config_and_ledger(tmpdir)
+            feature_id = ledger.latest_feature_snapshots(limit=1)[0]["id"]
+            client = TestClient(create_app_from_config(config, ledger, demo_data=True))
+
+            html = client.get(f"/replay/decision/{feature_id}").text
+
+            self.assertIn("cycle_feature_rows", html)
+            self.assertNotIn("raw_features_json", html)
+            self.assertNotIn("[{", html)
+
+    def test_model_card_distinguishes_missing_training_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config, ledger = create_demo_config_and_ledger(tmpdir)
+            client = TestClient(create_app_from_config(config, ledger, demo_data=True))
+
+            html = client.get("/models/demo-model-v2").text
+
+            self.assertIn("Training Evidence", html)
+            self.assertIn("No matching training run found for this model version.", html)
+
     def test_audit_export_pack_is_redacted(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             config, ledger = create_demo_config_and_ledger(Path(tmpdir) / "demo")
@@ -158,6 +208,13 @@ class WebDashboardTest(unittest.TestCase):
                     {"summary.json", "report.html", "manifest.json", "checksums.sha256", "README.txt"},
                     names,
                 )
+                manifest = json.loads(archive.read("manifest.json").decode("utf-8"))
+                manifest_names = {entry["name"] for entry in manifest["files"]}
+                self.assertEqual(names, manifest_names)
+                checksum_text = archive.read("checksums.sha256").decode("utf-8")
+                self.assertIn("summary.json", checksum_text)
+                self.assertIn("report.html", checksum_text)
+                self.assertIn("README.txt", checksum_text)
                 combined = "\n".join(
                     archive.read(name).decode("utf-8")
                     for name in sorted(names)
