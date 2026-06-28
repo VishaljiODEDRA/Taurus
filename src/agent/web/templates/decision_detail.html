@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Taurus Decision Detail{% endblock %}
+{% block page_title %}Decision Drill-Down{% endblock %}
+
+{% block content %}
+{% if missing %}
+  <section class="panel"><p class="empty">Decision evidence was not found.</p></section>
+{% else %}
+  <section class="metric-grid">
+    <article class="metric"><span>Symbol</span><strong>{{ decision.symbol }}</strong><small>{{ decision.created_at }}</small></article>
+    <article class="metric"><span>Action</span><strong>{{ decision.action }}</strong><small>Proposed action</small></article>
+    <article class="metric"><span>Score</span><strong>{{ decision.score|num }}</strong><small>Decision score</small></article>
+    <article class="metric"><span>Confidence</span><strong>{{ decision.confidence|num }}</strong><small>Decision confidence</small></article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading"><h2>Reason</h2><a href="/replay/decision/{{ decision.id }}">Replay this decision</a></div>
+    <p class="callout">{{ decision.reason|default("No reason summary recorded.") }}</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading"><h2>Feature Evidence</h2><span>Grouped summary, raw payload hidden</span></div>
+    {% if feature_groups %}
+      <div class="two-column">
+        {% for group, values in feature_groups.items() %}
+          <article class="subpanel">
+            <h3>{{ group }}</h3>
+            <dl class="kv-list">
+              {% for key, value in values %}
+                <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+              {% endfor %}
+            </dl>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty">No grouped feature evidence available.</p>
+    {% endif %}
+  </section>
+
+  <section class="two-column">
+    <article class="panel">
+      <div class="panel-heading"><h2>Risk Checks</h2><span>{{ relationship_labels.risk }}</span></div>
+      {% if risk_checks %}
+        <div class="table-wrap"><table><thead><tr><th>Time</th><th>Status</th><th>Reason</th><th>Target</th></tr></thead><tbody>
+          {% for row in risk_checks %}
+            <tr><td>{{ row.created_at }}</td><td><span class="status {{ row.approved|status_class }}">{{ row.approved }}</span></td><td>{{ row.reason }}</td><td>{{ row.target_notional_usd|money }}</td></tr>
+          {% endfor %}
+        </tbody></table></div>
+      {% else %}<p class="empty">No related risk checks found.</p>{% endif %}
+    </article>
+    <article class="panel">
+      <div class="panel-heading"><h2>Orders</h2><span>{{ relationship_labels.orders }}</span></div>
+      {% set orders = orders %}
+      {% include "_orders_table.html" %}
+    </article>
+  </section>
+
+  <section class="two-column">
+    <article class="panel">
+      <div class="panel-heading"><h2>Committee Votes</h2><span>{{ relationship_labels.committee }}</span></div>
+      {% if committee_votes %}
+        <div class="table-wrap"><table><thead><tr><th>Time</th><th>Action</th><th>Approved</th><th>Consensus</th></tr></thead><tbody>
+          {% for vote in committee_votes %}
+            <tr><td>{{ vote.created_at }}</td><td>{{ vote.final_action }}</td><td><span class="status {{ vote.approved|status_class }}">{{ vote.approved }}</span></td><td>{{ vote.consensus_score|num }}</td></tr>
+          {% endfor %}
+        </tbody></table></div>
+      {% else %}<p class="empty">No related committee votes found.</p>{% endif %}
+    </article>
+    <article class="panel">
+      <div class="panel-heading"><h2>Execution Simulation</h2></div>
+      {% if executions %}
+        <div class="table-wrap"><table><thead><tr><th>Time</th><th>Quality</th><th>Slippage</th><th>Fill</th></tr></thead><tbody>
+          {% for row in executions %}
+            <tr><td>{{ row.created_at }}</td><td>{{ row.quality_score|num }}</td><td>{{ row.expected_slippage_bps|num }} bps</td><td>{{ row.fill_probability|pct }}</td></tr>
+          {% endfor %}
+        </tbody></table></div>
+      {% else %}<p class="empty">No related execution simulations found.</p>{% endif %}
+    </article>
+  </section>
+{% endif %}
+{% endblock %}
+

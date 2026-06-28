@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Taurus Replay Detail{% endblock %}
+{% block page_title %}Replay This Decision{% endblock %}
+
+{% block content %}
+{% if missing %}
+  <section class="panel"><p class="empty">Replay decision evidence was not found.</p></section>
+{% else %}
+  <section class="metric-grid">
+    <article class="metric"><span>Symbol</span><strong>{{ selected_decision.symbol }}</strong><small>{{ as_of_timestamp }}</small></article>
+    <article class="metric"><span>Action</span><strong>{{ selected_decision.action }}</strong><small>Selected decision</small></article>
+    <article class="metric"><span>Replay coverage</span><strong class="status {{ replay_confidence|status_class }}">{{ replay_confidence }}</strong><small>Evidence completeness</small></article>
+    <article class="metric"><span>Missing evidence</span><strong>{{ missing_evidence|length }}</strong><small>Coverage gaps</small></article>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><h2>What Taurus Knew Then</h2></div>
+    <dl class="kv-grid">
+      {% for key, value in point_in_time_context|items_compact %}
+        <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+      {% endfor %}
+    </dl>
+  </section>
+  <section class="two-column">
+    <article class="panel"><div class="panel-heading"><h2>Risk Evidence</h2></div>{% if related_risk %}<div class="table-wrap"><table><thead><tr><th>Time</th><th>Status</th><th>Reason</th></tr></thead><tbody>{% for row in related_risk %}<tr><td>{{ row.created_at }}</td><td><span class="status {{ row.approved|status_class }}">{{ row.approved }}</span></td><td>{{ row.reason }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="empty">No related risk check found.</p>{% endif %}</article>
+    <article class="panel"><div class="panel-heading"><h2>Model Evidence</h2></div>{% if related_model %}<dl class="kv-grid"><div><dt>Version</dt><dd>{{ related_model.model_version }}</dd></div><div><dt>Status</dt><dd>{{ related_model.status }}</dd></div></dl>{% else %}<p class="empty">No model version found.</p>{% endif %}</article>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><h2>Replay Coverage Gaps</h2></div>
+    {% if missing_evidence %}<ul class="plain-list">{% for item in missing_evidence %}<li>{{ item }}</li>{% endfor %}</ul>{% else %}<p class="callout">Replay coverage is complete for the available local evidence.</p>{% endif %}
+  </section>
+{% endif %}
+{% endblock %}

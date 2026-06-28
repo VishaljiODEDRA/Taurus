@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Taurus Reliability{% endblock %}
+{% block page_title %}Reliability Dashboard{% endblock %}
+
+{% block content %}
+{% if grouped_reports %}
+  {% for report_type, rows in grouped_reports.items() %}
+    <section class="panel">
+      <div class="panel-heading"><h2>{{ report_type }}</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Status</th><th>Summary</th><th>Metrics</th></tr></thead>
+          <tbody>
+            {% for report in rows %}
+              <tr>
+                <td>{{ report.created_at }}</td>
+                <td><span class="status {{ report.status|status_class }}">{{ report.status }}</span></td>
+                <td class="truncate">{{ report.summary }}</td>
+                <td>
+                  {% for key, value in report.raw_json|items_compact %}
+                    <span class="mini-kv">{{ key }}={{ value }}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endfor %}
+{% else %}
+  <section class="panel"><p class="empty">No reliability reports recorded yet.</p></section>
+{% endif %}
+{% endblock %}
+

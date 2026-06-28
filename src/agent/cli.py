@@ -11,6 +11,7 @@ from agent.broker_sync import BrokerAccountSync, broker_research_config
 from agent.calibration import ModelCalibrator
 from agent.config import load_config
 from agent.engine import TradingAgent
+from agent.export_pack import build_audit_export_pack
 from agent.ledger import Ledger
 from agent.metrics import PerformanceMetrics, TradeRecord, calculate_metrics
 from agent.monitoring import HealthMonitor
@@ -151,6 +152,22 @@ def main() -> None:
         help="Show the institutional decision/risk/execution dashboard summary",
     )
     report.add_argument("--limit", type=int, default=10)
+
+    web = subparsers.add_parser(
+        "web",
+        parents=[config_parent],
+        help="Run the read-only local web dashboard",
+    )
+    web.add_argument("--host", default="127.0.0.1", help="Bind host; defaults to local-only")
+    web.add_argument("--port", type=int, default=8000, help="Bind port")
+    web.add_argument("--demo-data", action="store_true", help="Run with a synthetic public-safe demo ledger")
+
+    export_pack = subparsers.add_parser(
+        "export-audit-pack",
+        parents=[config_parent],
+        help="Create a redacted local audit evidence pack",
+    )
+    export_pack.add_argument("--output", required=True, help="Output ZIP path")
 
     replay = subparsers.add_parser(
         "replay-as-of",
@@ -358,6 +375,21 @@ def main() -> None:
     if args.command == "report":
         ledger = Ledger(config.storage.sqlite_path, config.storage.audit_log_path)
         _print_report(ReportingDashboard(ledger).summary(limit=args.limit))
+        return
+
+    if args.command == "web":
+        import uvicorn
+
+        from agent.web.app import create_app
+
+        app = create_app(config_path=args.config, demo_data=args.demo_data)
+        uvicorn.run(app, host=args.host, port=args.port)
+        return
+
+    if args.command == "export-audit-pack":
+        ledger = Ledger(config.storage.sqlite_path, config.storage.audit_log_path)
+        output = build_audit_export_pack(config, ledger, args.output)
+        print(f"Redacted audit export pack written: {output}")
         return
 
     if args.command == "replay-as-of":

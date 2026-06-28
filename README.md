@@ -59,6 +59,7 @@ Built today:
 - Backtesting, walk-forward validation, calibration, model training, model promotion/rejection, reliability reports, and realistic replay.
 - Broker reconciliation for position drift, missing orders, duplicate exposure, stale protection, and P&L mismatches.
 - Monitoring alerts that can trigger the kill switch for critical conditions.
+- Read-only local web dashboard for viewing ledger-backed cycle, risk, decision, model, reliability, reconciliation, and audit evidence.
 
 Planned through the Taurus roadmap:
 
@@ -135,6 +136,54 @@ python3 -m agent kill-switch on --config config/strategy.toml
 python3 -m agent kill-switch status --config config/strategy.toml
 python3 -m agent kill-switch off --config config/strategy.toml
 ```
+
+Run the read-only local dashboard:
+
+```bash
+python3 -m agent.web --config config/strategy.toml --host 127.0.0.1 --port 8000
+```
+
+Or through the main CLI:
+
+```bash
+python3 -m agent web --config config/strategy.toml --host 127.0.0.1 --port 8000
+```
+
+The dashboard is local-only by default, read-only, and displays a persistent safety notice: research/paper/demo trading only, not investment advice, and no performance promises. It shows sanitized summaries from the local ledger and does not render raw broker payloads, credentials, full private paths, or account identifiers.
+
+Run the public-safe synthetic demo dashboard:
+
+```bash
+python3 -m agent.web --demo-data --host 127.0.0.1 --port 8000
+```
+
+The demo mode creates an obviously synthetic ledger in a temporary location, so reviewers can inspect Taurus without private `state/`, `logs/`, broker payloads, account IDs, or credentials.
+
+Governance cockpit routes:
+
+- `/`: overview of latest cycle, risk, decisions, orders, reconciliation, and model status.
+- `/timeline`: chronological governance evidence timeline.
+- `/decisions`: decision evidence table.
+- `/decisions/{id}`: decision drill-down with features, risk, committee, execution, orders, and related evidence.
+- `/risk`: latest portfolio risk and stress summary.
+- `/risk/controls`: deterministic risk control matrix.
+- `/models`: model registry and promotion/rejection overview.
+- `/models/{version}`: model card with metrics, feature set, limitations, and promotion history.
+- `/reliability`: calibration, feature ablation, scorecard, dataset, and governance reports.
+- `/reconciliation`: broker/local state reconciliation summary.
+- `/incidents`: halted cycles, risk blocks, reconciliation warnings, model rejections, and reliability review items.
+- `/governance/roles`: governed agent role boundaries.
+- `/replay`: decision replay index.
+- `/replay/decision/{id}`: governed causality replay for one decision.
+- `/audit`: recent orders, decisions/features, position reviews, cycle health, and audit-log metadata.
+
+Create a redacted audit evidence pack:
+
+```bash
+python3 -m agent export-audit-pack --config config/strategy.toml --output exports/YYYY-MM-DD-taurus-audit-pack.zip
+```
+
+The export contains `summary.json`, `report.html`, `manifest.json`, `checksums.sha256`, and `README.txt`. It excludes raw broker payloads, credentials, account identifiers, full private paths, raw audit logs, and trading-performance claims.
 
 ## Readiness Workflow
 
@@ -251,6 +300,7 @@ The Taurus production plan is captured in these documents:
 - [docs/MODEL_GOVERNANCE.md](docs/MODEL_GOVERNANCE.md): feature evidence, training lifecycle, promotion gates, reliability reports, drift, and replay.
 - [docs/BROKER_AND_EXECUTION.md](docs/BROKER_AND_EXECUTION.md): shadow/demo/live modes, broker selection, eToro execution flow, demo/live safety gates, and reconciliation.
 - [docs/DEMO_TRADING_PROTOCOL.md](docs/DEMO_TRADING_PROTOCOL.md): demo-only operating workflow, validation commands, live-block checks, and weekly redacted summaries.
+- [docs/GOVERNANCE_COCKPIT.md](docs/GOVERNANCE_COCKPIT.md): dashboard cockpit, demo data mode, replay, audit export pack, incidents, and governed agent roles.
 - [docs/build-logs/README.md](docs/build-logs/README.md): public build-log system, publishing rules, weekly template, and index.
 - [docs/OUTREACH.md](docs/OUTREACH.md): feedback-first outreach pack, demo outline, public target research, message drafts, and private CRM template.
 
@@ -340,6 +390,38 @@ Do not commit:
 - generated caches
 
 Commit only safe source code, tests, examples, documentation, and configuration templates such as `config/strategy.example.toml`.
+
+## Branching Workflow
+
+Use `main` as the stable public branch. Do not develop large features directly on `main`.
+
+Recommended branch types:
+
+- `feature/<short-name>` for new product capabilities, such as `feature/web-dashboard-mvp`.
+- `docs/<short-name>` for documentation-only work.
+- `fix/<short-name>` for bug fixes.
+- `chore/<short-name>` for dependency, tooling, or repository hygiene.
+- `release/<version-or-date>` only when preparing a tagged release.
+
+Typical flow:
+
+```bash
+git switch main
+git pull
+git switch -c feature/web-dashboard-mvp
+python3 -m unittest discover -s tests
+git status --short
+git add <safe files only>
+git commit -m "Add read-only web dashboard MVP"
+git push -u origin feature/web-dashboard-mvp
+```
+
+Before merging a feature branch, verify:
+
+- `python3 -m unittest discover -s tests` passes,
+- `git diff --check` passes,
+- `.env`, `config/strategy.toml`, `state/`, `logs/`, and `private/` remain untracked,
+- public docs contain no credentials, account IDs, raw private ledgers, or trading-performance claims.
 
 ## Large Universe And Data Sources
 

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Taurus Risk Controls{% endblock %}
+{% block page_title %}Risk Control Matrix{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-heading"><h2>Deterministic Safety Controls</h2><span>Thresholds and recent breach evidence</span></div>
+  {% if controls %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Control</th><th>Enabled</th><th>Threshold</th><th>Status</th><th>Reason</th><th>Last Breach</th><th>Evidence</th></tr></thead>
+        <tbody>
+          {% for control in controls %}
+            <tr>
+              <td><strong>{{ control.name }}</strong></td>
+              <td><span class="status {{ control.enabled|status_class }}">{{ control.enabled }}</span></td>
+              <td>{{ control.threshold }}</td>
+              <td><span class="status {{ control.severity }}">{{ control.latest_status }}</span></td>
+              <td>{{ control.latest_reason }}</td>
+              <td>{{ control.last_breach_time|default("None") }}</td>
+              <td>{{ control.evidence_source }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No risk controls available.</p>
+  {% endif %}
+</section>
+{% endblock %}
+

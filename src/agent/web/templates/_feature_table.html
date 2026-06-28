@@ -1,0 +1,35 @@
+{% set features = recent_features if recent_features is defined else features %}
+{% if features %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Symbol</th>
+          <th>Action</th>
+          <th>Score</th>
+          <th>Confidence</th>
+          <th>Risk</th>
+          <th>Committee</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in features %}
+          <tr>
+            <td>{{ row.created_at }}</td>
+            <td><a class="table-link" href="/decisions/{{ row.id }}"><strong>{{ row.symbol }}</strong></a></td>
+            <td>{{ row.action }}</td>
+            <td>{{ row.score|num }}</td>
+            <td>{{ row.confidence|num }}</td>
+            <td><span class="status {{ row.risk_approved|status_class }}">{{ row.risk_approved|default("n/a") }}</span></td>
+            <td><span class="status {{ row.committee_approved|status_class }}">{{ row.committee_approved|default("n/a") }}</span></td>
+            <td class="truncate" title="{{ row.reason }}">{{ row.reason|default("No reason summary recorded.") }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="empty">No decision feature snapshots recorded yet.</p>
+{% endif %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Taurus Audit{% endblock %}
+{% block page_title %}Audit View{% endblock %}
+
+{% block content %}
+<section class="metric-grid">
+  <article class="metric"><span>Audit log</span><strong>{% if audit_log.exists %}present{% else %}missing{% endif %}</strong><small>{{ audit_log.name }}</small></article>
+  <article class="metric"><span>Audit size</span><strong>{{ audit_log.size_kb }} KB</strong><small>Raw contents hidden</small></article>
+  <article class="metric"><span>Modified</span><strong>{{ audit_log.modified_at }}</strong><small>Filesystem metadata</small></article>
+  <article class="metric"><span>Cycle rows</span><strong>{{ cycle_health|length }}</strong><small>Recent health records</small></article>
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Recent Orders</h2></div>
+  {% set orders = orders %}
+  {% include "_orders_table.html" %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Recent Decisions And Features</h2></div>
+  {% set features = features %}
+  {% include "_feature_table.html" %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Position Reviews</h2></div>
+  {% if position_reviews %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Symbol</th><th>Action</th><th>Urgency</th><th>Score</th><th>Confidence</th></tr></thead>
+        <tbody>
+          {% for review in position_reviews %}
+            <tr>
+              <td>{{ review.created_at }}</td>
+              <td><strong>{{ review.symbol }}</strong></td>
+              <td>{{ review.action }}</td>
+              <td>{{ review.urgency_score|num }}</td>
+              <td>{{ review.score|num }}</td>
+              <td>{{ review.confidence|num }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No position reviews recorded yet.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Cycle Health</h2></div>
+  {% if cycle_health %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Halted</th><th>Reason</th><th>Decisions</th><th>Risk</th><th>Orders</th><th>Rejected</th></tr></thead>
+        <tbody>
+          {% for row in cycle_health %}
+            <tr>
+              <td>{{ row.created_at }}</td>
+              <td><span class="status {{ row.halted|status_class }}">{{ row.halted }}</span></td>
+              <td class="truncate">{{ row.halt_reason }}</td>
+              <td>{{ row.decision_count }}</td>
+              <td>{{ row.risk_check_count }}</td>
+              <td>{{ row.order_count }}</td>
+              <td>{{ row.rejected_order_count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No cycle health records yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
+

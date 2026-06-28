@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Taurus Governed Roles{% endblock %}
+{% block page_title %}Governed Agent Roles{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-heading"><h2>Role Boundaries</h2><span>AI may propose; deterministic controls decide</span></div>
+  <div class="role-grid">
+    {% for role in roles %}
+      <article class="subpanel">
+        <h2>{{ role.name }}</h2>
+        <p>{{ role.purpose }}</p>
+        <dl class="kv-list">
+          <div><dt>Can execute trade</dt><dd><span class="status {{ role.can_execute_trade|status_class }}">{{ role.can_execute_trade }}</span></dd></div>
+          <div><dt>Deterministic required</dt><dd>{{ role.deterministic_required }}</dd></div>
+          <div><dt>Modules</dt><dd>{{ role.module_mapping|join(", ") }}</dd></div>
+        </dl>
+        <h3>Allowed</h3><div class="tag-list">{% for item in role.allowed_actions %}<span>{{ item }}</span>{% endfor %}</div>
+        <h3>Forbidden</h3><div class="tag-list danger-tags">{% for item in role.forbidden_actions %}<span>{{ item }}</span>{% endfor %}</div>
+        <h3>Evidence</h3><div class="tag-list">{% for item in role.evidence_outputs %}<span>{{ item }}</span>{% endfor %}</div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+

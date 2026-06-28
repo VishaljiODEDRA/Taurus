@@ -613,6 +613,33 @@ class Ledger:
             )
         self.audit("decision", decision)
 
+    def latest_decisions(self, limit: int = 20) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT * FROM decisions ORDER BY id DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        output = [dict(row) for row in rows]
+        for row in output:
+            row["reasons_json"] = _loads(row.get("reasons_json"), [])
+            row["features_json"] = _loads(row.get("features_json"), {})
+        return output
+
+    def decision_by_id(self, decision_id: int) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            row = conn.execute(
+                "SELECT * FROM decisions WHERE id = ?",
+                (decision_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        record = dict(row)
+        record["reasons_json"] = _loads(record.get("reasons_json"), [])
+        record["features_json"] = _loads(record.get("features_json"), {})
+        return record
+
     def record_position_review(self, review: SignalDecision) -> None:
         now = _now_iso()
         urgency_score = float(review.features.get("urgency_score", review.score))
@@ -657,6 +684,29 @@ class Ledger:
                 ),
             )
         self.audit("risk", {"symbol": symbol, "decision": decision})
+
+    def latest_risk_checks(self, limit: int = 50) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT * FROM risk_checks ORDER BY id DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def latest_risk_checks_for_symbol(self, symbol: str, limit: int = 20) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                """
+                SELECT * FROM risk_checks
+                WHERE symbol = ?
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (symbol.upper(), limit),
+            ).fetchall()
+        return [dict(row) for row in rows]
 
     def record_order(self, order: OrderResult) -> None:
         now = _now_iso()
@@ -962,6 +1012,18 @@ class Ledger:
             )
         self.audit("reconciliation", {"status": status, "message": message, "raw": raw or {}})
 
+    def latest_reconciliations(self, limit: int = 10) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT * FROM reconciliations ORDER BY id DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        output = [dict(row) for row in rows]
+        for row in output:
+            row["raw_json"] = _loads(row.get("raw_json"), {})
+        return output
+
     def record_calibration(
         self,
         *,
@@ -1049,6 +1111,20 @@ class Ledger:
             rows = conn.execute(
                 "SELECT * FROM orders ORDER BY id DESC LIMIT ?",
                 (limit,),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def latest_orders_for_symbol(self, symbol: str, limit: int = 20) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                """
+                SELECT * FROM orders
+                WHERE symbol = ?
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (symbol.upper(), limit),
             ).fetchall()
         return [dict(row) for row in rows]
 
@@ -2177,6 +2253,61 @@ class Ledger:
         for row in rows:
             row["features_json"] = _loads(row.get("features_json"), {})
         return rows
+
+    def feature_snapshot_by_id(self, snapshot_id: int) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            row = conn.execute(
+                "SELECT * FROM feature_snapshots WHERE id = ?",
+                (snapshot_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        record = dict(row)
+        record["features_json"] = _loads(record.get("features_json"), {})
+        return record
+
+    def model_version_by_version(self, model_version: str) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            row = conn.execute(
+                """
+                SELECT * FROM model_registry
+                WHERE model_version = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (model_version,),
+            ).fetchone()
+        if row is None:
+            return None
+        record = dict(row)
+        record["feature_names_json"] = _loads(record.get("feature_names_json"), [])
+        record["metrics_json"] = _loads(record.get("metrics_json"), {})
+        record["parameters_json"] = _loads(record.get("parameters_json"), {})
+        return record
+
+    def table_count(self, table: str) -> int:
+        allowed = {
+            "decisions",
+            "risk_checks",
+            "orders",
+            "cycle_health",
+            "model_registry",
+            "model_training_runs",
+            "model_promotion_events",
+            "reliability_reports",
+            "reconciliations",
+            "portfolio_risk_reports",
+            "feature_snapshots",
+            "committee_votes",
+            "execution_simulations",
+        }
+        if table not in allowed:
+            raise ValueError(f"unsupported count table: {table}")
+        with self._connect() as conn:
+            row = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
+        return int(row[0]) if row else 0
 
     def _latest_rows(self, table: str, limit: int) -> list[dict[str, Any]]:
         allowed = {

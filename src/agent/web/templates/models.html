@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Taurus Models{% endblock %}
+{% block page_title %}Model Governance{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-heading"><h2>Latest Training Run</h2></div>
+  {% if latest_training %}
+    <dl class="kv-grid">
+      <div><dt>Model</dt><dd>{{ latest_training.model_name }}</dd></div>
+      <div><dt>Version</dt><dd>{{ latest_training.model_version }}</dd></div>
+      <div><dt>Samples</dt><dd>{{ latest_training.sample_count }}</dd></div>
+      <div><dt>Train window</dt><dd>{{ latest_training.train_window }}</dd></div>
+      <div><dt>Test window</dt><dd>{{ latest_training.test_window }}</dd></div>
+      <div><dt>Created</dt><dd>{{ latest_training.created_at }}</dd></div>
+    </dl>
+    <div class="subsection">
+      <h3>Metrics</h3>
+      <dl class="kv-grid">
+        {% for key, value in latest_training.metrics_json|items_compact %}
+          <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+        {% endfor %}
+      </dl>
+    </div>
+  {% else %}
+    <p class="empty">No model training runs recorded yet.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Model Registry</h2><span>Promotion is governed evidence, not automatic trust.</span></div>
+  {% if model_versions %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Name</th><th>Version</th><th>Status</th><th>Artifact</th><th>Trained Until</th></tr></thead>
+        <tbody>
+          {% for model in model_versions %}
+            <tr>
+              <td>{{ model.created_at }}</td>
+              <td>{{ model.model_name }}</td>
+              <td><a class="table-link" href="/models/{{ model.model_version }}">{{ model.model_version }}</a></td>
+              <td><span class="status {{ model.status|status_class }}">{{ model.status }}</span></td>
+              <td>{{ model.artifact_path }}</td>
+              <td>{{ model.trained_until }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No model versions registered yet.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Promotion And Rejection Events</h2></div>
+  {% if promotion_events %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Model</th><th>Version</th><th>Promoted</th><th>Reason</th></tr></thead>
+        <tbody>
+          {% for event in promotion_events %}
+            <tr>
+              <td>{{ event.created_at }}</td>
+              <td>{{ event.model_name }}</td>
+              <td>{{ event.model_version }}</td>
+              <td><span class="status {{ event.promoted|status_class }}">{{ event.promoted }}</span></td>
+              <td class="truncate">{{ event.reason }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No promotion or rejection events recorded yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
