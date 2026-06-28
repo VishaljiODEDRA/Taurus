@@ -244,7 +244,7 @@ Use the product, reports, docs, and evidence pack to support pilot conversations
 
 Success means the company has credible user demand for governance infrastructure, not speculative trading claims.
 
-### May 2027: Global Talent Evidence
+### May 2027: The Goal
 
 Package the product, technical evidence, roadmap execution, adoption, pilots, public writing, and external feedback into a coherent founder narrative.
 

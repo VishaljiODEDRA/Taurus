@@ -269,7 +269,7 @@ Do not present paper/demo results as future-performance evidence.
 
 ## Weekly Non-Sensitive Summary
 
-Create a short weekly summary for public build logs, investor evidence, or Global Talent evidence. Store only redacted summaries in public docs. Keep raw ledgers, logs, account snapshots, broker payloads, and screenshots private.
+Create a short weekly summary for public build logs, investor evidence, or founder evidence. Store only redacted summaries in public docs. Keep raw ledgers, logs, account snapshots, broker payloads, and screenshots private.
 
 Suggested filename:
 
@@ -379,7 +379,7 @@ After running:
 - Do not commit private runtime files.
 - Record engineering follow-ups in public-safe language.
 
-## Global Talent Evidence Positioning
+## Product Validation and Evidence Positioning
 
 This protocol supports future evidence by showing:
 

@@ -963,7 +963,7 @@ Timeline:
 
 Goal:
 
-Stabilize the product for external review, beta evidence, and Global Talent materials.
+Stabilize the product for external review, beta evidence, and other founder evidence materials.
 
 Implementation tasks:
 
@@ -1103,4 +1103,3 @@ Enterprise pilot gate:
 8. Add tenant isolation tests before expanding beta functionality.
 9. Add deployment docs and hosted staging.
 10. Add product instrumentation from the first authenticated workflow.
-
