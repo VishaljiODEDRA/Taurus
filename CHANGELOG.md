@@ -8,6 +8,11 @@ The format follows a simple date-based project log while the project is pre-1.0.
 
 ### Added
 
+- Governance cockpit upgrades for demo data mode, evidence timeline, decision drill-down, risk control matrix, model cards, incident timeline, governed agent role boundaries, and decision replay flow.
+- Redacted audit export pack command that writes `summary.json`, `report.html`, `manifest.json`, `checksums.sha256`, and `README.txt` into a public-safe ZIP archive.
+- Synthetic public-safe demo ledger generator for dashboard review without private runtime data.
+- Read-only FastAPI/Jinja2 web dashboard MVP with overview, decision, risk, model governance, reliability, reconciliation, and audit views backed by the existing ledger/reporting layer.
+- Local dashboard run commands through `python3 -m agent.web` and `python3 -m agent web`, plus README branching workflow guidance for feature, docs, fix, chore, and release branches.
 - Feedback-first outreach pack with public target research, founder/AI/risk message drafts, demo outline, funding-aware notes, and private CRM template.
 - Public build-log system under `docs/build-logs/` with publishing rules, weekly template, index, and first founder-engineer build log.
 - Demo-only trading protocol documenting shadow/demo operation, live-trading blocks, kill-switch usage, safe validation commands, reconciliation/report workflow, and weekly redacted evidence summaries.

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Taurus Incidents{% endblock %}
+{% block page_title %}Incident And Halt Timeline{% endblock %}
+
+{% block content %}
+<section class="metric-grid">
+  <article class="metric"><span>Critical</span><strong>{{ counts.critical }}</strong><small>Needs attention</small></article>
+  <article class="metric"><span>Warning</span><strong>{{ counts.warning }}</strong><small>Control review</small></article>
+  <article class="metric"><span>Review</span><strong>{{ counts.review }}</strong><small>Governance review</small></article>
+  <article class="metric"><span>Total</span><strong>{{ incidents|length }}</strong><small>Recent incidents</small></article>
+</section>
+<section class="panel">
+  <div class="panel-heading"><h2>Operations Events</h2></div>
+  {% if incidents %}
+    <div class="table-wrap"><table><thead><tr><th>Time</th><th>Type</th><th>Severity</th><th>Status</th><th>Source</th><th>Summary</th><th>Next Step</th></tr></thead><tbody>
+      {% for incident in incidents %}
+        <tr><td>{{ incident.timestamp }}</td><td>{{ incident.incident_type }}</td><td><span class="status {{ incident.severity|status_class }}">{{ incident.severity }}</span></td><td>{{ incident.status }}</td><td>{{ incident.source }}</td><td>{{ incident.summary }}</td><td>{{ incident.recommended_next_step }}</td></tr>
+      {% endfor %}
+    </tbody></table></div>
+  {% else %}<p class="empty">No incidents found in recent governance evidence.</p>{% endif %}
+</section>
+{% endblock %}
+

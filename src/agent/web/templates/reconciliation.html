@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Taurus Reconciliation{% endblock %}
+{% block page_title %}Broker Reconciliation{% endblock %}
+
+{% block content %}
+<section class="metric-grid">
+  <article class="metric">
+    <span>Status</span>
+    {% if latest %}
+      <strong class="status {{ latest.status|status_class }}">{{ latest.status }}</strong>
+      <small>{{ latest.created_at }}</small>
+    {% else %}
+      <strong class="status neutral">not run</strong>
+      <small>No reconciliation recorded yet</small>
+    {% endif %}
+  </article>
+  <article class="metric"><span>Alerts</span><strong>{{ alerts|length }}</strong><small>Latest reconciliation payload</small></article>
+  <article class="metric"><span>Open positions</span><strong>{{ broker_snapshot.open_positions|default("n/a") }}</strong><small>Broker snapshot summary</small></article>
+  <article class="metric"><span>Environment</span><strong>{{ broker_snapshot.environment|default(runtime.environment) }}</strong><small>Snapshot basis</small></article>
+</section>
+
+<section class="two-column">
+  <article class="panel">
+    <div class="panel-heading"><h2>Latest Reconciliation</h2></div>
+    {% if latest %}
+      <p class="callout">{{ latest.message }}</p>
+    {% else %}
+      <p class="empty">Run reconcile from the CLI to record reconciliation evidence.</p>
+    {% endif %}
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><h2>Broker Snapshot</h2><span>Raw broker payload is not displayed</span></div>
+    {% if broker_snapshot %}
+      <dl class="kv-grid">
+        <div><dt>NAV</dt><dd>{{ broker_snapshot.nav_usd|money }}</dd></div>
+        <div><dt>Cash</dt><dd>{{ broker_snapshot.available_cash_usd|money }}</dd></div>
+        <div><dt>Daily P&amp;L</dt><dd>{{ broker_snapshot.daily_pnl_pct|pct }}</dd></div>
+        <div><dt>Drawdown</dt><dd>{{ broker_snapshot.rolling_drawdown_pct|pct }}</dd></div>
+        <div><dt>Exposure</dt><dd>{{ broker_snapshot.gross_exposure_pct|pct }}</dd></div>
+        <div><dt>Created</dt><dd>{{ broker_snapshot.created_at }}</dd></div>
+      </dl>
+    {% else %}
+      <p class="empty">No broker account snapshot recorded yet.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Alerts</h2></div>
+  {% if alerts %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Level</th><th>Code</th><th>Symbol</th><th>Message</th></tr></thead>
+        <tbody>
+          {% for alert in alerts %}
+            <tr>
+              <td><span class="status {{ alert.level|status_class }}">{{ alert.level }}</span></td>
+              <td>{{ alert.code }}</td>
+              <td>{{ alert.symbol|default("") }}</td>
+              <td class="truncate">{{ alert.message }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No reconciliation alerts recorded in the latest report.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Recent Local Orders</h2></div>
+  {% set orders = recent_orders %}
+  {% include "_orders_table.html" %}
+</section>
+{% endblock %}
+

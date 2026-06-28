@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Taurus Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="/static/app.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">T</span>
+          <div>
+            <strong>Taurus</strong>
+            <span>Governance Dashboard</span>
+          </div>
+        </div>
+        <nav class="nav">
+          {% for key, label, href in nav_items %}
+            <a class="{% if active == key %}active{% endif %}" href="{{ href }}">{{ label }}</a>
+          {% endfor %}
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="safety-banner">{{ safety_notice }}</div>
+        {% if runtime.dangerous_runtime %}
+          <div class="danger-banner">
+            Runtime warning: this config reports mode={{ runtime.mode }} environment={{ runtime.environment }}.
+            This dashboard remains read-only and exposes no execution controls.
+          </div>
+        {% endif %}
+
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Read-only local operations view</p>
+            <h1>{% block page_title %}Overview{% endblock %}</h1>
+          </div>
+          <div class="runtime-grid">
+            <div><span>Mode</span><strong>{{ runtime.mode }}</strong></div>
+            <div><span>Environment</span><strong>{{ runtime.environment }}</strong></div>
+            <div>
+              <span>Kill switch</span>
+              <strong class="status {{ runtime.kill_switch_active|status_class }}">
+                {% if runtime.kill_switch_active %}active{% else %}inactive{% endif %}
+              </strong>
+            </div>
+            <div><span>Ledger</span><strong>{{ runtime.ledger_name }}</strong></div>
+          </div>
+          {% if runtime.demo_data %}
+            <div class="demo-pill">Demo data</div>
+          {% endif %}
+        </header>
+
+        {% block content %}{% endblock %}
+
+        <footer class="footer">Read-only local dashboard. Private runtime data stays local.</footer>
+      </main>
+    </div>
+  </body>
+</html>

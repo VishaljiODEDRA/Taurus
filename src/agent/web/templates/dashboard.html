@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Taurus Overview{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<section class="metric-grid">
+  <article class="metric">
+    <span>Cycle status</span>
+    {% if latest_cycle %}
+      <strong class="status {% if latest_cycle.halted %}bad{% else %}good{% endif %}">
+        {% if latest_cycle.halted %}halted{% else %}operational{% endif %}
+      </strong>
+      <small>{{ latest_cycle.created_at }}</small>
+    {% else %}
+      <strong class="status neutral">no cycles</strong>
+      <small>No cycle health recorded yet</small>
+    {% endif %}
+  </article>
+  <article class="metric">
+    <span>Decisions</span>
+    <strong>{{ latest_cycle.decision_count|default("0") }}</strong>
+    <small>Latest recorded cycle</small>
+  </article>
+  <article class="metric">
+    <span>Orders</span>
+    <strong>{{ latest_cycle.order_count|default("0") }}</strong>
+    <small>{{ latest_cycle.rejected_order_count|default("0") }} rejected</small>
+  </article>
+  <article class="metric">
+    <span>Reconciliation</span>
+    {% if latest_reconciliation %}
+      <strong class="status {{ latest_reconciliation.status|status_class }}">{{ latest_reconciliation.status }}</strong>
+      <small>{{ latest_reconciliation.created_at }}</small>
+    {% else %}
+      <strong class="status neutral">not run</strong>
+      <small>No reconciliation recorded yet</small>
+    {% endif %}
+  </article>
+</section>
+
+<section class="two-column">
+  <article class="panel">
+    <div class="panel-heading">
+      <h2>Latest Portfolio Risk</h2>
+      <a href="/risk">Open risk</a>
+    </div>
+    {% if latest_risk %}
+      <dl class="kv-grid">
+        <div><dt>VaR 95</dt><dd>{{ latest_risk.var_pct|pct }}</dd></div>
+        <div><dt>CVaR 95</dt><dd>{{ latest_risk.cvar_pct|pct }}</dd></div>
+        <div><dt>Expected shortfall</dt><dd>{{ latest_risk.expected_shortfall_pct|pct }}</dd></div>
+        <div><dt>ES USD</dt><dd>{{ latest_risk.expected_shortfall_usd|money }}</dd></div>
+      </dl>
+    {% else %}
+      <p class="empty">No portfolio risk reports recorded yet.</p>
+    {% endif %}
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading">
+      <h2>Latest Model Training</h2>
+      <a href="/models">Open models</a>
+    </div>
+    {% if latest_training %}
+      <dl class="kv-grid">
+        <div><dt>Model</dt><dd>{{ latest_training.model_name }}</dd></div>
+        <div><dt>Version</dt><dd>{{ latest_training.model_version|default("n/a") }}</dd></div>
+        <div><dt>Samples</dt><dd>{{ latest_training.sample_count }}</dd></div>
+        <div><dt>Created</dt><dd>{{ latest_training.created_at }}</dd></div>
+      </dl>
+    {% else %}
+      <p class="empty">No model training runs recorded yet.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <h2>Recent Decisions</h2>
+    <a href="/decisions">Open decisions</a>
+  </div>
+  {% include "_feature_table.html" %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <h2>Recent Orders</h2>
+    <a href="/audit">Open audit</a>
+  </div>
+  {% set orders = recent_orders %}
+  {% include "_orders_table.html" %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <h2>Reliability Status</h2>
+    <a href="/reliability">Open reliability</a>
+  </div>
+  {% if recent_reliability %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Type</th><th>Status</th><th>Summary</th></tr></thead>
+        <tbody>
+          {% for report in recent_reliability %}
+            <tr>
+              <td>{{ report.created_at }}</td>
+              <td>{{ report.report_type }}</td>
+              <td><span class="status {{ report.status|status_class }}">{{ report.status }}</span></td>
+              <td class="truncate">{{ report.summary }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No reliability reports recorded yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
+

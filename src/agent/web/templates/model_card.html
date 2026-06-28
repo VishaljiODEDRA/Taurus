@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Taurus Model Card{% endblock %}
+{% block page_title %}Model Card{% endblock %}
+
+{% block content %}
+{% if missing %}
+  <section class="panel"><p class="empty">Model version was not found.</p></section>
+{% else %}
+  <section class="metric-grid">
+    <article class="metric"><span>Model</span><strong>{{ model.model_name }}</strong><small>{{ model.created_at }}</small></article>
+    <article class="metric"><span>Version</span><strong>{{ model.model_version }}</strong><small>{{ model.artifact_path }}</small></article>
+    <article class="metric"><span>Status</span><strong class="status {{ model.status|status_class }}">{{ model.status }}</strong><small>Registry state</small></article>
+    <article class="metric"><span>Trained until</span><strong>{{ model.trained_until }}</strong><small>Evidence window</small></article>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><h2>Governance Statement</h2></div>
+    <p class="callout">This model is governed evidence, not investment advice. Promotion requires recorded metrics, reliability context, and deterministic controls.</p>
+  </section>
+  <section class="two-column">
+    <article class="panel">
+      <div class="panel-heading"><h2>Metrics</h2></div>
+      <dl class="kv-grid">{% for key, value in model.metrics_json|items_compact %}<div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>{% endfor %}</dl>
+    </article>
+    <article class="panel">
+      <div class="panel-heading"><h2>Feature Set</h2></div>
+      {% if model.feature_names_json %}
+        <div class="tag-list">{% for feature in model.feature_names_json %}<span>{{ feature }}</span>{% endfor %}</div>
+      {% else %}<p class="empty">No feature names recorded.</p>{% endif %}
+    </article>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><h2>Known Limitations</h2></div>
+    <ul class="plain-list">{% for item in known_limitations %}<li>{{ item }}</li>{% endfor %}</ul>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><h2>Promotion History</h2></div>
+    {% if promotion_events %}
+      <div class="table-wrap"><table><thead><tr><th>Time</th><th>Promoted</th><th>Reason</th></tr></thead><tbody>
+        {% for event in promotion_events %}<tr><td>{{ event.created_at }}</td><td><span class="status {{ event.promoted|status_class }}">{{ event.promoted }}</span></td><td>{{ event.reason }}</td></tr>{% endfor %}
+      </tbody></table></div>
+    {% else %}<p class="empty">No promotion/rejection events found for this version.</p>{% endif %}
+  </section>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Taurus Risk{% endblock %}
+{% block page_title %}Risk Dashboard{% endblock %}
+
+{% block content %}
+<section class="metric-grid">
+  <article class="metric"><span>VaR 95</span><strong>{{ latest.var_pct|pct }}</strong><small>Latest portfolio report</small></article>
+  <article class="metric"><span>CVaR 95</span><strong>{{ latest.cvar_pct|pct }}</strong><small>Tail loss estimate</small></article>
+  <article class="metric"><span>Expected shortfall</span><strong>{{ latest.expected_shortfall_pct|pct }}</strong><small>{{ latest.expected_shortfall_usd|money }}</small></article>
+  <article class="metric"><span>Risk blocks</span><strong>{{ blocked|length }}</strong><small>Recent cycle rows</small></article>
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <h2>Risk Control Matrix</h2>
+    <a href="/risk/controls">Open controls</a>
+  </div>
+  <p class="callout">Deterministic controls decide whether AI-assisted proposals can proceed. The matrix shows thresholds, recent pass/fail state, and breach evidence.</p>
+</section>
+
+
+<section class="two-column">
+  <article class="panel">
+    <div class="panel-heading"><h2>Stress Scenarios</h2></div>
+    {% if latest.scenarios_json %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Scenario</th><th>Summary</th></tr></thead>
+          <tbody>
+            {% for name, value in latest.scenarios_json.items() %}
+              <tr><td><strong>{{ name }}</strong></td><td>{{ value }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty">No stress scenarios recorded yet.</p>
+    {% endif %}
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><h2>Risk Settings Snapshot</h2></div>
+    <dl class="kv-grid">
+      {% for key, value in settings.items() %}
+        <div><dt>{{ key }}</dt><dd>{{ value }}</dd></div>
+      {% endfor %}
+    </dl>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-heading"><h2>Recent Risk Blocks</h2></div>
+  {% if blocked %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Symbol</th><th>Action</th><th>Score</th><th>Target</th><th>Risk Approved</th></tr></thead>
+        <tbody>
+          {% for row in blocked %}
+            <tr>
+              <td>{{ row.created_at }}</td>
+              <td><strong>{{ row.symbol }}</strong></td>
+              <td>{{ row.action }}</td>
+              <td>{{ row.decision_score|num }}</td>
+              <td>{{ row.risk_target_notional_usd|money }}</td>
+              <td><span class="status bad">{{ row.risk_approved }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No recent risk blocks found in cycle feature rows.</p>
+  {% endif %}
+</section>
+{% endblock %}

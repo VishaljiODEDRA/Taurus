@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Taurus Evidence Timeline{% endblock %}
+{% block page_title %}Evidence Timeline{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-heading">
+    <h2>Governed Causality</h2>
+    <span>Latest evidence first</span>
+  </div>
+  {% if events %}
+    <div class="timeline">
+      {% for event in events %}
+        <article class="timeline-event">
+          <div class="timeline-marker {{ event.severity }}"></div>
+          <div class="timeline-body">
+            <div class="timeline-meta">
+              <span class="event-chip">{{ event.event_type }}</span>
+              <span class="status {{ event.severity }}">{{ event.status }}</span>
+              {% if event.symbol %}<strong>{{ event.symbol }}</strong>{% endif %}
+              <span>{{ event.timestamp }}</span>
+            </div>
+            <h2>{{ event.title }}</h2>
+            <p>{{ event.summary }}</p>
+            {% if event.evidence_link %}<a href="{{ event.evidence_link }}">Inspect evidence</a>{% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty">No governance timeline events recorded yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
+

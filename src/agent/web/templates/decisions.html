@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Taurus Decisions{% endblock %}
+{% block page_title %}Decision Governance{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-heading">
+    <h2>Recent Decision Evidence</h2>
+    <span>Feature snapshots with risk and committee context where recorded</span>
+  </div>
+  {% include "_feature_table.html" %}
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <h2>Cycle Feature Rows</h2>
+    <span>Structured decision rows used for replay and training</span>
+  </div>
+  {% if cycle_features %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Cycle</th><th>Symbol</th><th>Action</th><th>Risk</th><th>Score</th><th>Confidence</th><th>Target</th></tr></thead>
+        <tbody>
+          {% for row in cycle_features %}
+            <tr>
+              <td>{{ row.created_at }}</td>
+              <td>{{ row.cycle_id }}</td>
+              <td><strong>{{ row.symbol }}</strong></td>
+              <td>{{ row.action }}</td>
+              <td><span class="status {{ row.risk_approved|status_class }}">{{ row.risk_approved }}</span></td>
+              <td>{{ row.decision_score|num }}</td>
+              <td>{{ row.decision_confidence|num }}</td>
+              <td>{{ row.risk_target_notional_usd|money }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty">No cycle feature rows recorded yet.</p>
+  {% endif %}
+</section>
+
+<section class="two-column">
+  <article class="panel">
+    <div class="panel-heading"><h2>Committee Votes</h2></div>
+    {% if committee_votes %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Symbol</th><th>Action</th><th>Approved</th><th>Consensus</th></tr></thead>
+          <tbody>
+            {% for vote in committee_votes %}
+              <tr>
+                <td>{{ vote.created_at }}</td>
+                <td><strong>{{ vote.symbol }}</strong></td>
+                <td>{{ vote.final_action }}</td>
+                <td><span class="status {{ vote.approved|status_class }}">{{ vote.approved }}</span></td>
+                <td>{{ vote.consensus_score|num }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty">No committee votes recorded yet.</p>
+    {% endif %}
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><h2>Execution Simulations</h2></div>
+    {% if executions %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Symbol</th><th>Action</th><th>Quality</th><th>Slippage</th><th>Fill</th></tr></thead>
+          <tbody>
+            {% for execution in executions %}
+              <tr>
+                <td>{{ execution.created_at }}</td>
+                <td><strong>{{ execution.symbol }}</strong></td>
+                <td>{{ execution.action }}</td>
+                <td>{{ execution.quality_score|num }}</td>
+                <td>{{ execution.expected_slippage_bps|num }} bps</td>
+                <td>{{ execution.fill_probability|pct }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty">No execution simulations recorded yet.</p>
+    {% endif %}
+  </article>
+</section>
+{% endblock %}
+

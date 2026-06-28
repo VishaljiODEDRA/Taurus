@@ -1,0 +1,33 @@
+{% if orders %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Mode</th>
+          <th>Symbol</th>
+          <th>Action</th>
+          <th>Accepted</th>
+          <th>Order ID</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr>
+            <td>{{ order.created_at }}</td>
+            <td>{{ order.mode }}</td>
+            <td><strong>{{ order.symbol }}</strong></td>
+            <td>{{ order.action }}</td>
+            <td><span class="status {{ order.accepted|status_class }}">{{ order.accepted }}</span></td>
+            <td>{{ order.broker_order_id|default("redacted") }}</td>
+            <td class="truncate">{{ order.message }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="empty">No orders recorded yet.</p>
+{% endif %}
+
